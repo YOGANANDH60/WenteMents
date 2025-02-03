@@ -1,0 +1,45 @@
+{% extends "shop/main.html" %} {% block content %} {% load static %}
+
+<div class="row m-5">
+  <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+    <img src="{{product.pimage.url}}" alt="" width="250px" height="300px" />
+  </div>
+  <div class="col-12 col-sm-6 col-md-6 col-lg-6 mt-3">
+    <h1>Negotiate Price for {{ product.pname }}</h1>
+    <p>Original Price: <strong>${{ product.nprice }}</strong></p>
+  </div>
+</div>
+
+{% if negotiation_result == "accepted" %}
+<div class="row">
+  <div class=" text-center">
+    <h2>🎉 Offer Accepted!</h2>
+    <p>Your offer has been accepted at the price you suggested.</p>
+    <a href="{% url 'home' %}">Back to Home</a>
+  </div>
+</div>
+{% elif negotiation_result == "counter" %}
+<h2>🤝 Counter Offer</h2>
+<p>
+  We can't accept your offer, but we can sell for
+  <strong>${{ counter_offer }}</strong>.
+</p>
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="user_offer" value="{{ counter_offer }}" />
+  <button type="submit">Accept Counter Offer</button>
+</form>
+
+{% elif negotiation_result == "rejected" %}
+<h2>❌ Offer Rejected</h2>
+<p>Sorry, your offer was too low. Please try again.</p>
+<a href="{% url 'negotiate' product.pname %}">Try Again</a>
+
+{% else %}
+<form method="post" class="m-5 text-center">
+  {% csrf_token %}
+  <label for="user_offer">Your Offer:</label>
+  <input type="number" name="user_offer" required step="0.01" min="1" />
+  <button type="submit">Submit Offer</button>
+</form>
+{% endif %} {% endblock content %}

@@ -1,0 +1,85 @@
+{% extends "shop/main.html" %} {% block content %} {% load static %}
+<!-- prodect page  -->
+
+<section class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>{{ productdetails.0.category.name }} Products</h1>
+
+    </div>
+    {% for items in productdetails %}
+    <div class="popular col-12 col-sm-6 col-md-6 col-lg-6 col-xl-3 my-4">
+      <div class="card" style="width: 20rem">
+        <a href="{% url 'single_productdetails' items.category.name items.pname %}">
+          <img
+            src="{{items.pimage.url}}"
+            class="card-img-top p-2"
+            alt="..."
+            height="350px"
+          />
+        </a>
+        <div class="card-body">
+          <p
+            class="card-text text-muted"
+            style="font-size: 18px; position: relative; top: 7px"
+          >
+            {{items.category.name}}
+          </p>
+          <p class="card-text fw-bold">{{items.pname}}</p>
+        </div>
+        <div class="d-flex justify-content-between p-3">
+          <div class="rate d-flex align-items-center">
+            <p style="font-size: 20px" class="fw-bold">
+              &#8377;{{items.nprice}}
+            </p>
+            <p class="ps-2 text-muted" style="position: relative; top: 3px">
+              <s>&#8377;{{items.oprice}}</s>
+            </p>
+          </div>
+          <div class="add">
+            <button class="btn btn-primary"><big>+ </big>Add</button>
+          </div>
+        </div>
+        <div class="preview">
+          <a href="#"
+            ><button
+              class="btn btn-light"
+              data-bs-toggle="tooltip"
+              data-bs-title="quick view"
+            >
+              <i class="fa-regular fa-eye"></i></button
+          ></a>
+          <a href="#"
+            ><button
+              class="btn btn-light"
+              data-bs-toggle="tooltip"
+              data-bs-title="fav"
+            >
+              <i class="fa-regular fa-heart"></i></button
+          ></a>
+          <a href="#"
+            ><button
+              class="btn btn-light"
+              data-bs-toggle="tooltip"
+              data-bs-title="home"
+            >
+              <i class="fa-solid fa-house"></i></button
+          ></a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+{% endblock content %} {% block scripts %}
+<!-- Tooltip -->
+<script>
+  const tooltipTriggerList = document.querySelectorAll(
+    '[data-bs-toggle="tooltip"]'
+  );
+  const tooltipList = [...tooltipTriggerList].map(
+    (tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
+  );
+</script>
+{% endblock scripts %}
