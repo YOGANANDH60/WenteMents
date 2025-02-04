@@ -5,12 +5,13 @@
   <div class="row">
     <div class="col-12">
       <h1>{{ productdetails.0.category.name }} Products</h1>
-
     </div>
     {% for items in productdetails %}
     <div class="popular col-12 col-sm-6 col-md-6 col-lg-6 col-xl-3 my-4">
       <div class="card" style="width: 20rem">
-        <a href="{% url 'single_productdetails' items.category.name items.pname %}">
+        <a
+          href="{% url 'single_productdetails' items.category.name items.pname %}"
+        >
           <img
             src="{{items.pimage.url}}"
             class="card-img-top p-2"

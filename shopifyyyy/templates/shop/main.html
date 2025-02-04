@@ -170,7 +170,7 @@
                   <a href="{% url "blog" %}" class="nav-link">blog</a>
                 </li>
                 <li class="nav-item">
-                  <a href="about.html" class="nav-link">About</a>
+                  <a href="{% url "about" %}" class="nav-link">About</a>
                 </li>
                 {% if request.user.is_authenticated %}
                   <li class="nav-item">
@@ -208,7 +208,7 @@
         <div class="col-12 col-sm-6 col-md-6 col-lg-4">
           <h4>About</h4>
           <p><a href="#">Contact As</a></p>
-          <p><a href="#">About As</a></p>
+          <p><a href="{% url "about" %}">About As</a></p>
         </div>
         <div class="col-12 col-sm-6 col-md-6 col-lg-4">
           <h4>Consumer Policy</h4>
@@ -220,17 +220,15 @@
         </div>
         <div class="col-12 col-sm-6 col-md-6 col-lg-4">
           <h4>Category</h4>
-          <p><a href="">Outfits</a></p>
-          <p><a href="">accessories</a></p>
-          <p><a href="">electroines</a></p>
-          <p><a href="">games</a></p>
-          <p><a href="">sports</a></p>
+          {% for items in categories %}
+            <p><a href="{% url 'productdetails' items.name %}">{{items.name}}</a></p>
+          {% endfor %}
         </div>
       </div>
       <div class="row mt-5 social">
         <div class="col-12 col-sm-12 col-md-6 col-lg-6 social-icon">
           <h4>Social</h4>
-          <div class="d-flex ps-3">
+          <div class="d-flex ps-3 sicon">
             <p>
               <a href=""><i class="fa-brands fa-facebook"></i></a>
             </p>

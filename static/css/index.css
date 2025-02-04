@@ -16,7 +16,7 @@ a {
   font-style: italic;
   font-weight: bolder;
   font-size: 22px;
-}
+} 
 
 .navv a:hover {
   opacity: 75%;
@@ -56,7 +56,6 @@ a {
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-
   transition: transform 0.2s ease, opacity 0.1s ease-in;
 }
 
@@ -276,10 +275,9 @@ a {
   margin-right: 10rem;
   padding-bottom: 30px;
 }
-.social i {
+.sicon p i {
   padding-top: 10px;
-  color: rgb(196, 199, 196);
-  font-size: 25px;
+  font-size: 880px;
   cursor: pointer;
 }
 .social .payment img {
@@ -353,4 +351,8 @@ a {
   border-left: 2px solid green;
   padding-left: 50px;
   padding-right: 50px;
+}
+
+.user{
+  margin-bottom: 50px;
 }
