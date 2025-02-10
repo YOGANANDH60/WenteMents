@@ -53,11 +53,10 @@
         <div
           class="search col-lg-4 col-md-2 d-flex justify-content-center d-none d-lg-flex"
         >
-          <input class="form-control" type="search" /><button
-            class="btn btn-success"
-          >
-            Search
-          </button>
+          <form method="GET" action="{% url 'search_view' %}" class="d-flex">
+            <input class="form-control" type="text" name="search" placeholder="Search for products">
+            <button class="btn btn-success" type="submit">Search</button>
+          </form>
         </div>
         <!-- carts and fav  cfu-cart,fav,user-->
 
@@ -236,7 +235,7 @@
               <a href="" class="ps-4"><i class="fa-brands fa-youtube"></i></a>
             </p>
             <p>
-              <a href="" class="ps-4"><i class="fa-brands fa-twitter"></i></a>
+              <a href="" class="ps-4"><i class="fa-brands fa-square-x-twitter"></i></a>
             </p>
           </div>
         </div>

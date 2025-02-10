@@ -119,3 +119,17 @@ def blog(request):
 def about(request):
     categories = category.objects.filter(status=0)
     return render(request, "shop/about.html",{'categories': categories})
+
+
+def search_view(request):
+    categories = category.objects.filter(status=0)
+    query = request.GET.get('search')
+    if query:
+        productdetails = product.objects.filter(pname__icontains=query)
+        if productdetails:
+            return render(request, 'shop/productdetails.html', {'productdetails': productdetails,'categories': categories})
+        else:
+            messages.error(request, "No such product found")
+            return redirect('home')
+    else:
+        return redirect('home')
