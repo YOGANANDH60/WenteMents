@@ -122,6 +122,7 @@ def about(request):
 
 
 def search_view(request):
+
     categories = category.objects.filter(status=0)
     query = request.GET.get('search')
     if query:
@@ -133,3 +134,6 @@ def search_view(request):
             return redirect('home')
     else:
         return redirect('home')
+    
+def logout(request):
+    return redirect('home')

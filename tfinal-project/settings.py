@@ -30,6 +30,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+SITE_ID = 2
+
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -39,8 +41,38 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shopifyyyy',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+LOGIN_REDIRECT_URL = 'home/'
+LOGOUT_REDIRECT_URL = '/home'
+
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False  # If you don't need username
+SOCIALACCOUNT_QUERY_EMAIL = True
+SOCIALACCOUNT_STORE_TOKENS = True
 
 LOGIN_URL = '/admin/login/'  # Redirects users to the admin login page
 
@@ -53,6 +85,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'allauth.account.middleware.AccountMiddleware',
   
 ]
 

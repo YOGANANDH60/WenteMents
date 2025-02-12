@@ -42,7 +42,7 @@ class productImages(models.Model):
 # new
 class Negotiation(models.Model):
     product = models.ForeignKey(product, on_delete=models.CASCADE)
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null= True)
     current_offer = models.FloatField(null=True, blank=True)
     counter_offer = models.FloatField(null=True, blank=True)
     attempts = models.PositiveIntegerField(default=0)

@@ -51,6 +51,16 @@
           </form>
           <p class="my-2">Already User? <a href="#">Login Now</a></p>
         </div>
+        {% load socialaccount %}
+    
+        {% if user.is_authenticated %}
+        <p>Debug User: {{ user }}</p>
+        <p>Email: {{ user.email }}</p>
+        <p>Username: {{ user.username }}</p>
+        <a href="{% url 'account_logout' %}">Logout</a>   
+        {% else %}
+          <a href="{% provider_login_url 'google' %}?next=/">Login with Google</a>
+        {% endif %}
       </div>
     </div>
   </div>
