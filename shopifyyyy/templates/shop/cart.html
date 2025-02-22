@@ -1,0 +1,82 @@
+{% extends "shop/main.html" %} 
+{% block content %} 
+{% load static %}
+
+<!-- Cart Title -->
+<div class="col-12 card bg-info text-white text-center">
+  <h1 class="card-title">Cart</h1>
+  <p>Here you can see your cart</p>
+</div>
+
+<!-- Cart Content -->
+<div class="container pt-3">
+  <div class="row">
+    <div class="col-12 text-center mb-3">
+      <a href="#" class="btn btn-primary btn-lg w-100">Checkout</a>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered table-dark text-center">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Details</th>
+          <th>Quantity</th>
+          <th>Total</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for items in cart %}
+        <tr>
+          <td>
+            <img src="{{items.product.pimage.url}}" 
+                 alt="" class="img-fluid rounded" 
+                 style="max-width: 80px; height: auto;" />
+          </td>
+          <td>
+            <p class="mb-1"><strong>{{items.product.pname}}</strong></p>
+            <p class="text-muted">₹ {{items.product.nprice | floatformat:2}}</p>
+          </td>
+          <td>{{items.product_quantity}}</td>
+          <td class="amt">₹ {{items.product_total_price | floatformat:2}}</td>
+          <td>
+            <a href="{% url 'remove_cart' items.id %}" 
+               onclick="return confirm('Are you sure you want to remove this item?')" 
+               class="btn btn-danger btn-sm">
+              Remove
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center text-warning">Your cart is empty</td>
+        </tr>
+        {% endfor %}
+        <tr class="bg-secondary text-white">
+          <td colspan="3"></td>
+          <td><b>Total:</b></td>
+          <td id="net">₹ 0.00</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var total = 0;
+    document.querySelectorAll(".amt").forEach(function (item) {
+      total += parseFloat(item.textContent.replace("₹ ", ""));
+    });
+    document.getElementById("net").textContent = "₹ " + total.toFixed(2);
+    
+    if (window.innerWidth < 768) {
+      alert("For a better shopping experience, please switch to a desktop or tablet view.");
+    }
+  });
+</script>
+{% endblock %}
+{% endblock content %}

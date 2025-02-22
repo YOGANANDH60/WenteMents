@@ -1,0 +1,76 @@
+{% extends "shop/main.html" %} 
+{% block content %} 
+{% load static %}
+
+<!-- Fav Title -->
+<div class="col-12 card bg-info text-white text-center">
+  <h1 class="card-title">Favorites</h1>
+  <p>Here you can see your favorite items</p>
+</div>
+
+<!-- Fav Content -->
+<div class="container pt-3">
+    {% if fav %}
+        <div class="table-responsive">
+            <table class="table table-bordered text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Product Price</th>
+                        <th>Remove</th>
+                        <th>Full view</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for items in fav %}
+                    <tr>
+                        <td>
+                            <img src="{{ items.product.pimage.url }}" 
+                                 alt="Product Image" 
+                                 class="img-fluid rounded" 
+                                 style="max-width: 150px; height: auto;" />
+                        </td>
+                        <td>{{ items.product.pname }}</td>
+                        <td>₹ {{ items.product.nprice | stringformat:'d' }}</td>
+                        <td>
+                            <a href="{% url 'remove_fav' items.id %}" 
+                               onclick="return confirm('Are you sure you want to remove this item?')" 
+                               class="btn btn-danger btn-sm">
+                                Remove
+                            </a>
+                        </td>
+                        <td>
+                            <a class="btn btn-light text-primary fw-bold" href="{% url 'single_productdetails' items.product.category.name items.product.pname %}">
+                                View Details
+                            </a>
+                            
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <h1 class="text-danger">No favorite items</h1>
+        </div>
+    {% endif %}
+</div>
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Alert for better experience if viewed on mobile
+    if (window.innerWidth < 768) {
+      let lastAlertTime = localStorage.getItem("favMobileAlertTime");
+      let currentTime = new Date().getTime();
+
+      if (!lastAlertTime || currentTime - lastAlertTime > 60000) {
+        alert("For a better view, please use a desktop or tablet.");
+        localStorage.setItem("favMobileAlertTime", currentTime);
+      }
+    }
+  });
+</script>
+{% endblock %}
+
+{% endblock content %}

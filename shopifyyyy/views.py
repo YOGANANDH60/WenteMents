@@ -1,16 +1,36 @@
-from django.shortcuts import render,redirect,get_object_or_404,HttpResponse
+from django.shortcuts import render,redirect,get_object_or_404,HttpResponse 
 from .models import *
 from django.contrib import messages
 from .form import customeuserform
 from django.contrib.auth import authenticate,login,logout
+from django.http import JsonResponse
+import json
 
 
 # Create your views here.
 
 def home(request):
-    products=product.objects.filter(trending=1)
-    categories = category.objects.filter(status=0) 
-    return render(request, "shop/index.html",{'products': products,'categories': categories})
+    products = product.objects.filter(trending=1)
+    categories = category.objects.filter(status=0)
+
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
+
+
+    return render(request, "shop/index.html", {
+        'products': products, 
+        'categories': categories, 
+        'fav_count': fav_count, 
+
+    })
+
+
+
+
+def some_view(request):
+    fav_count = fav.objects.filter(user=request.user).count()  
+    return render(request, 'home.html', {'fav_count': fav_count})
 
 def login_page(request):
     categories = category.objects.filter(status=0)
@@ -49,20 +69,30 @@ def logout_page(request):
 
 
 def categories(request):
-    categories = category.objects.filter(status=0) 
-    return render(request, "shop/category.html", {'categories': categories}) 
+    categories = category.objects.filter(status=0)   
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
+    return render(request, "shop/category.html", {'categories': categories , 'fav_count': fav_count})     
 
 def productdetails(request,name):
-    categories = category.objects.filter(status=0) 
+    categories = category.objects.filter(status=0)
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
+
     if(category.objects.filter(name=name,status=0)):
          productdetails = product.objects.filter(category__name=name) 
-         return render(request, "shop/productdetails.html", {'productdetails': productdetails,'categories': categories})
+         return render(request, "shop/productdetails.html", {'productdetails': productdetails,'categories': categories, 'fav_count': fav_count})
     else:
         messages.warning(request,"no such category found")
         return redirect('category')  
 
 def single_productdetails(request,cname,spname):
     categories = category.objects.filter(status=0) 
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
     if(category.objects.filter(name=cname,status=0)):
         if(product.objects.filter(pname=spname)):
             products = product.objects.get(pname=spname)
@@ -70,7 +100,8 @@ def single_productdetails(request,cname,spname):
             context = {
                 'products': products,
                 'sideimg': sideimg,
-                'categories': categories
+                'categories': categories,
+                'fav_count': fav_count
             }
             return render(request, 'shop/single_productdetails.html', context)
         else:
@@ -84,6 +115,7 @@ def single_productdetails(request,cname,spname):
 def negotiate(request, product_name):
     product_obj = get_object_or_404(product, pname=product_name)
     categories = category.objects.filter(status=0)
+
     if product_obj.nprice < 1000:  
         messages.warning(request, "Negotiation is only available for products priced above 1000.")
         return redirect('productdetails', name=product_obj.category.name,)
@@ -113,12 +145,18 @@ def negotiate(request, product_name):
 def blog(request):
     blog = articals.objects.all()
     categories = category.objects.filter(status=0)
-    return render(request, "shop/blog.html", {'blog': blog,'categories': categories})
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
+    return render(request, "shop/blog.html", {'blog': blog,'categories': categories, 'fav_count': fav_count})
 
 
 def about(request):
     categories = category.objects.filter(status=0)
-    return render(request, "shop/about.html",{'categories': categories})
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
+    return render(request, "shop/about.html",{'categories': categories, 'fav_count': fav_count})
 
 
 def search_view(request):
@@ -136,4 +174,116 @@ def search_view(request):
         return redirect('home')
     
 def logout(request):
+    return redirect('home')
+
+
+def add_to_cart(request):
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if request.user.is_authenticated:
+            
+            try:
+                body = request.body.decode('utf-8')
+                print("Raw Request Body:", body)  # Debugging: Print request body
+
+                data = json.loads(body)
+                print("Parsed Data:", data)  # Debugging: Print parsed data
+
+                # ✅ Ensure correct key names
+                if 'pid' not in data or 'product_qty' not in data:
+                    return JsonResponse({'status': 'missing required fields'}, status=400)
+
+                product_id = data['pid']
+                product_qty = data['product_qty']
+
+                product_instance = get_object_or_404(product, id=product_id) 
+
+                if cart.objects.filter(User=request.user, product=product_instance).exists():
+                    return JsonResponse({'status': 'already added'}, status=200)
+
+                if product_instance.quantity >= product_qty:
+                    cart.objects.create(User=request.user, product=product_instance, product_quantity=product_qty)
+                    return JsonResponse({'status': 'added success'}, status=200)
+                else:
+                    return JsonResponse({'status': 'stock not available'}, status=200)
+
+            except json.JSONDecodeError:
+                return JsonResponse({'status': 'invalid JSON data'}, status=400)
+            except KeyError as e:
+                return JsonResponse({'status': f'error: Missing key {str(e)}'}, status=400)
+            except Exception as e:
+                return JsonResponse({'status': f'error: {str(e)}'}, status=500)
+        else:
+            return JsonResponse({'status': 'login required'}, status=401)
+    else:
+        return JsonResponse({'status': 'invalid access'}, status=403)
+
+def cart_page(request):
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
+    if request.user.is_authenticated:
+        categories = category.objects.filter(status=0)
+        Cart = cart.objects.filter(User=request.user)
+        return render(request, 'shop/cart.html', {'cart': Cart, 'categories': categories, 'fav_count': fav_count})
+    else:
+        return redirect('login')
+    
+
+def remove_cart(request, cid):
+    cartitems = cart.objects.get(id=cid)
+    cartitems.delete()
+    return redirect('cart')
+
+
+def fav_page(request):
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if request.user.is_authenticated:
+            try:
+                body = request.body.decode('utf-8')
+                print("Raw Request Body:", body)  # Debugging: Print request body
+
+                data = json.loads(body)
+                print("Parsed Data:", data)  # Debugging: Print parsed data
+
+                # ✅ Ensure correct key names
+                if 'pid' not in data:
+                    return JsonResponse({'status': 'missing required fields'}, status=400)
+
+                product_id = data['pid']
+                product_instance = get_object_or_404(product, id=product_id) 
+
+                if fav.objects.filter(User=request.user, product=product_instance).exists():
+                    return JsonResponse({'status': 'already added'}, status=200)
+
+                fav.objects.create(User=request.user, product=product_instance)
+                return JsonResponse({'status': 'added success'}, status=200)
+
+            except json.JSONDecodeError:
+                return JsonResponse({'status': 'invalid JSON data'}, status=400)
+            except KeyError as e:
+                return JsonResponse({'status': f'error: Missing key {str(e)}'}, status=400)
+            except Exception as e:
+                return JsonResponse({'status': f'error: {str(e)}'}, status=500)
+        else:
+            return JsonResponse({'status': 'login required'}, status=401)
+
+    else:
+        return JsonResponse({'status': 'invalid access'}, status=403)
+
+
+def fav_view_page(request):
+    fav_count = 0
+    if request.user.is_authenticated:
+        fav_count = fav.objects.filter(User=request.user).count()
+    if request.user.is_authenticated:
+        categories = category.objects.filter(status=0)
+        Fav = fav.objects.filter(User=request.user)
+        return render(request, 'shop/fav.html', {'fav': Fav,'categories': categories, 'fav_count': fav_count})
+    else:
+        return redirect('login')
+    
+def remove_fav(request, cid):
+    favitems = fav.objects.get(id=cid)
+    favitems.delete()
     return redirect('home')

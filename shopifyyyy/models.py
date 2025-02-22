@@ -32,14 +32,15 @@ class product(models.Model):
     trending = models.BooleanField(default=False,help_text="0-default,1-Trending")
     created_at = models.DateTimeField(auto_now_add=True)
 
-
+    def __str__(self):
+        return self.pname
 class productImages(models.Model):
     images = models.ImageField(upload_to="product-images")
     product = models.ForeignKey(product,on_delete=models.SET_NULL,null=True)
     date = models.DateTimeField(auto_now_add=True)
 
 
-# new
+# negotiation model
 class Negotiation(models.Model):
     product = models.ForeignKey(product, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null= True)
@@ -62,3 +63,23 @@ class articals(models.Model):
 
     def __str__(self):
         return self. blog_name
+
+
+class cart(models.Model):
+    User = models.ForeignKey(User,on_delete=models.CASCADE)
+    product = models.ForeignKey(product,on_delete=models.CASCADE)
+    product_quantity = models.IntegerField(null=False,blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def product_total_price(self):
+        return self.product_quantity * self.product.nprice
+
+   
+class fav(models.Model):
+    User = models.ForeignKey(User,on_delete=models.CASCADE)
+    product = models.ForeignKey(product,on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.User.username

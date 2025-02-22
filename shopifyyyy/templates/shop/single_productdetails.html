@@ -3,7 +3,7 @@
 <!-- single product details -->
 <div class="container mb-5">
   <div class="row">
-    <div class="col-12 col-md-5 col-lg-5" style="cursor: pointer">
+    <div class="col-12 col-md-12 col-lg-5 " style="cursor: pointer">
       <div
         id="carouselExampleInterval"
         class="carousel slide"
@@ -63,15 +63,51 @@
       </div>
     </div>
 
-    <div class="col-12 col-md-7 col-lg-7">
+    <div class="col-12 col-md-12 col-lg-7 ps-5 mt-md-5 mt-lg-0 mt-5">
       <h6 class="text-uppercase text-secondary">{{products.category.name}}</h6>
       <h2 class="fs-3">{{products.pname}}</h2>
       <h4 class="text-dark fw-bold">&#8377;{{products.nprice}}</h4>
-      <h6 class="text-secondary fw-bold"><s>&#8377;{{products.oprice}}</s></h6>
-      <button class="btn btn-dark w-100 my-5">
-        <i class="bi bi-cart-plus-fill"></i> Add to Cart
-      </button>
-      <div>
+      <h6 class="text-secondary fw-bold ps-2"><s>&#8377;{{products.oprice}}</s></h6>
+      {% if products.quantity > 0 %}
+      <input type="hidden" value="{{products.id}}" id="pid"/>
+
+      <p>
+        <div class="input-group" style="width: 150px;">
+          <button class="input-group-text bg-success text-light" id="btnMinus"><i class="fa fa-minus"></i></button>
+            <input type="text" id="texqut" class="form-control text-center" value="1" id="quantity" />
+          <button class="input-group-text bg-success text-light" id="btnPlus"><i class="fa fa-plus"></i></button>
+        </div>
+      </p>
+      <div class="d-flex">
+        <button class="btn btn-primary w-25 mt-3" id="btncart"><big>+ </big>Add</button>
+        {% else %}
+          <div class="add  mt-3">
+            <h5 class="text-danger">-out of stack</h5>
+          </div>
+        {% endif %}
+        <div class="add  mt-4 ms-4">
+          <button
+            id="btnfav"
+            style="
+              width: 20px;
+              height: 20px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              color: red;
+              fill: red;
+              outline: none;
+              border: none;
+              
+              
+            "
+          >
+            <i class="fa-solid  fa-heart" style="font-size: 30px"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="mt-5">
         <span class="text-secondary text-small">Details :</span>
 
         <div class="accordion accordion-flush" id="accordionExample">
@@ -168,5 +204,90 @@
     </div>
   </div>
 </div>
+
+{% block scripts %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      var btnPlus = document.getElementById("btnPlus");
+      var btnMinus = document.getElementById("btnMinus");
+      var texqut = document.getElementById("texqut");
+      var pid = document.getElementById("pid");
+      var btncart = document.getElementById("btncart");
+      var btnfav = document.getElementById("btnfav");
+      
+  
+      btnPlus.addEventListener("click", function (event) {
+          event.stopImmediatePropagation(); // Prevent duplicate execution
+          let qty = parseInt(texqut.value, 10) || 0;
+          if (qty < 10) {
+              texqut.value = qty + 1;
+          }
+      });
+  
+      btnMinus.addEventListener("click", function (event) {
+          event.stopImmediatePropagation();
+          let qty = parseInt(texqut.value, 10) || 0;
+          if (qty > 1) {
+              texqut.value = qty - 1;
+          }
+      });
+  
+      btncart.addEventListener("click", function (event) {
+          event.stopImmediatePropagation();
+          let qty = parseInt(texqut.value, 10) || 0;
+          if (qty > 0) {
+              let postobj = {
+                  pid: pid.value,
+                  product_qty: qty,
+              };
+              //console.log(postobj);
+              fetch("/addtocart/",{
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                  'Accept': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify(postobj)
+              }).then(response => {
+                return response.json();
+              }).then(data => {
+                //console.log(data);
+                alert(data['status']);
+              })
+          } else {
+              alert("Please enter quantity");
+          }
+      });
+
+      btnfav.addEventListener("click", function (event) {
+          event.stopImmediatePropagation();
+
+              let postobj = {
+                  pid: pid.value
+              };
+              //console.log(postobj);
+              fetch("/fav/",{
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                  'Accept': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify(postobj)
+              }).then(response => {
+                return response.json();
+              }).then(data => {
+                //console.log(data);
+                alert(data['status']);
+              })
+      });
+    });
+  
+
+  </script>
+{% endblock %}
 
 {% endblock content %}

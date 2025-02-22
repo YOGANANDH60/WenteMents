@@ -42,7 +42,7 @@
       <!-- logo -->
 
       <div class="navbar row">
-        <a href="index.html" class="col-4 col-md-4 col-lg-2"
+        <a href="{% url 'home' %}" class="col-4 col-md-4 col-lg-2"
           ><img
             src="{% static 'images/logo.png' %}"
             class="logo"
@@ -65,7 +65,7 @@
             <!-- cart img -->
             <div>
               <a
-                href="#"
+                href="{% url 'cart' %}"
                 style="
                   width: 20px;
                   height: 20px;
@@ -84,7 +84,7 @@
             <!-- fav img -->
             <div class="px-lg-5 px-md-4 px-sm-5 px-4">
               <a
-                href="#"
+                href="{% url 'favviewpage' %}"
                 style="
                   width: 20px;
                   height: 20px;
@@ -95,22 +95,12 @@
                 "
               >
                 <i class="fa-regular fa-heart" style="font-size: 25px"></i>
-              </a>
-            </div>
-            <!-- user img -->
-            <div>
-              <a
-                href="#"
-                style="
-                  width: 20px;
-                  height: 20px;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                  color: green;
-                "
-              >
-                <i class="fa-regular fa-user" style="font-size: 25px"></i>
+                {% if fav_count and fav_count > 0 %}
+                <span class="badge bg-danger position-relative   translate-middle"
+                      style="font-size: 12px; padding: 4px 7px; border-radius: 50%;">
+                    {{ fav_count }}
+                </span>
+                {% endif %}
               </a>
             </div>
           </div>
