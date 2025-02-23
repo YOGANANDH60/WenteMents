@@ -214,6 +214,7 @@
       var pid = document.getElementById("pid");
       var btncart = document.getElementById("btncart");
       var btnfav = document.getElementById("btnfav");
+      var availableStock = {{ products.quantity }};
       
   
       btnPlus.addEventListener("click", function (event) {
@@ -221,6 +222,8 @@
           let qty = parseInt(texqut.value, 10) || 0;
           if (qty < 10) {
               texqut.value = qty + 1;
+          }else {
+              alert("out of stock");
           }
       });
   
