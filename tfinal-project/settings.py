@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 SITE_ID = 2
 
 INSTALLED_APPS = [
+    'import_export',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
