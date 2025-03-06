@@ -43,13 +43,15 @@ class productImages(models.Model):
 # negotiation model
 class Negotiation(models.Model):
     product = models.ForeignKey(product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null= True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     current_offer = models.FloatField(null=True, blank=True)
     counter_offer = models.FloatField(null=True, blank=True)
+    final_price = models.FloatField(null=True, blank=True)  # Store the final agreed price
     attempts = models.PositiveIntegerField(default=0)
     max_attempts = models.PositiveIntegerField(default=3)
     is_successful = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
 
     def __str__(self):
         return f"Negotiation: {self.user.username} - {self.product.pname}"
@@ -72,9 +74,15 @@ class cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
-    def product_total_price(self):
-        return self.product_quantity * self.product.nprice
+    def product_price(self):
+        """Return negotiated price if available; otherwise, return normal price."""
+        negotiation = Negotiation.objects.filter(user=self.User, product=self.product, is_successful=True).first()
+        return negotiation.current_offer if negotiation else self.product.nprice
 
+    @property
+    def product_total_price(self):
+        """Calculate total price based on negotiated price if applicable."""
+        return self.product_quantity * self.product_price
    
 class fav(models.Model):
     User = models.ForeignKey(User,on_delete=models.CASCADE)

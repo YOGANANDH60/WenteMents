@@ -64,49 +64,56 @@
     </div>
 
     <div class="col-12 col-md-12 col-lg-7 ps-5 mt-md-5 mt-lg-0 mt-5">
-      <h6 class="text-uppercase text-secondary">{{products.category.name}}</h6>
-      <h2 class="fs-3">{{products.pname}}</h2>
-      <h4 class="text-dark fw-bold">&#8377;{{products.nprice}}</h4>
-      <h6 class="text-secondary fw-bold ps-2"><s>&#8377;{{products.oprice}}</s></h6>
+      <h6 class="text-uppercase text-secondary">{{ products.category.name }}</h6>
+      <h2 class="fs-3">{{ products.pname }}</h2>
+    
+      {% if final_price and final_price < products.nprice %}
+        <!-- Show Negotiated Price -->
+        <h4 class="text-dark fw-bold">&#8377;{{ final_price }} (Negotiated Price)</h4>
+        <h6 class="text-secondary fw-bold ps-2"><s>&#8377;{{ products.nprice }}</s></h6>
+      {% else %}
+        <!-- Show Original Price -->
+        <h4 class="text-dark fw-bold">&#8377;{{ products.nprice }}</h4>
+        <h6 class="text-secondary fw-bold ps-2"><s>&#8377;{{ products.oprice }}</s></h6>
+      {% endif %}
+    
       {% if products.quantity > 0 %}
-      <input type="hidden" value="{{products.id}}" id="pid"/>
-
-      <p>
-        <div class="input-group" style="width: 150px;">
-          <button class="input-group-text bg-success text-light" id="btnMinus"><i class="fa fa-minus"></i></button>
+        <input type="hidden" value="{{ products.id }}" id="pid" />
+    
+        <p>
+          <div class="input-group" style="width: 150px;">
+            <button class="input-group-text bg-success text-light" id="btnMinus"><i class="fa fa-minus"></i></button>
             <input type="text" id="texqut" class="form-control text-center" value="1" id="quantity" />
-          <button class="input-group-text bg-success text-light" id="btnPlus"><i class="fa fa-plus"></i></button>
-        </div>
-      </p>
-      <div class="d-flex">
-        <button class="btn btn-primary w-25 mt-3" id="btncart"><big>+ </big>Add</button>
+            <button class="input-group-text bg-success text-light" id="btnPlus"><i class="fa fa-plus"></i></button>
+          </div>
+        </p>
+    
+        <div class="d-flex">
+          <button class="btn btn-primary w-25 mt-3" id="btncart"><big>+ </big>Add</button>
         {% else %}
-          <div class="add  mt-3">
-            <h5 class="text-danger">-out of stack</h5>
+          <div class="add mt-3">
+            <h5 class="text-danger">- Out of Stock</h5>
           </div>
         {% endif %}
-        <div class="add  mt-4 ms-4">
-          <button
-            id="btnfav"
-            style="
-              width: 20px;
-              height: 20px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              color: red;
-              fill: red;
-              outline: none;
-              border: none;
-              
-              
-            "
-          >
-            <i class="fa-solid  fa-heart" style="font-size: 30px"></i>
-          </button>
+    
+          <div class="add mt-4 ms-4">
+            <button id="btnfav"
+              style="
+                width: 20px;
+                height: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: red;
+                fill: red;
+                outline: none;
+                border: none;">
+              <i class="fa-solid fa-heart" style="font-size: 30px"></i>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    
     <div class="mt-5">
         <span class="text-secondary text-small">Details :</span>
 

@@ -3,6 +3,7 @@ from .models import *
 from django.contrib import messages
 from .form import customeuserform
 from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 import json
 
@@ -88,46 +89,73 @@ def productdetails(request,name):
         messages.warning(request,"no such category found")
         return redirect('category')  
 
-def single_productdetails(request,cname,spname):
-    categories = category.objects.filter(status=0) 
+def single_productdetails(request, cname, spname):
+    categories = category.objects.filter(status=0)  
     fav_count = 0
+    final_price = None  
+
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
-    if(category.objects.filter(name=cname,status=0)):
-        if(product.objects.filter(pname=spname)):
-            products = product.objects.get(pname=spname)
-            sideimg = productImages.objects.filter(product=products)  # Fetch related images
-            context = {
-                'products': products,
-                'sideimg': sideimg,
-                'categories': categories,
-                'fav_count': fav_count
-            }
-            return render(request, 'shop/single_productdetails.html', context)
-        else:
-            messages.error(request,"no such product found")
-            return redirect('category')  
+
+    # Check if category exists
+    if category.objects.filter(name=cname, status=0).exists():
+        products = get_object_or_404(product, pname=spname)
+        sideimg = productImages.objects.filter(product=products)
+
+        # Check if the user has a successful negotiated price
+        if request.user.is_authenticated:
+            negotiation = Negotiation.objects.filter(user=request.user, product=products, is_successful=True).first()
+            if negotiation:
+                final_price = negotiation.current_offer  # Use negotiated price
+
+        context = {
+            'products': products,
+            'sideimg': sideimg,
+            'categories': categories,
+            'fav_count': fav_count,
+            'final_price': final_price if final_price else products.nprice,  # Pass negotiated price if available
+        }
+        return render(request, 'shop/single_productdetails.html', context)
     else:
-        messages.error(request,"no such catogory")
+        messages.error(request, "No such category found")
         return redirect('category')  
 
 
+@login_required
 def negotiate(request, product_name):
     product_obj = get_object_or_404(product, pname=product_name)
     categories = category.objects.filter(status=0)
+    user = request.user
 
-    if product_obj.nprice < 1000:  
+    # Check if user has an existing successful negotiation
+    negotiation = Negotiation.objects.filter(user=user, product=product_obj, is_successful=True).first()
+    
+    if negotiation:
+        final_price = negotiation.final_price  # Use the negotiated price
+    else:
+        final_price = product_obj.nprice  # Default price
+
+    if product_obj.nprice < 1000:
         messages.warning(request, "Negotiation is only available for products priced above 1000.")
-        return redirect('productdetails', name=product_obj.category.name,)
+        return redirect('productdetails', name=product_obj.category.name)
 
-    negotiation_result = None  
-    counter_offer = None  
+    negotiation_result = None
+    counter_offer = None
 
     if request.method == "POST":
         user_offer = float(request.POST.get("user_offer", 0))
 
         if user_offer >= product_obj.nprice * 0.9:
             negotiation_result = "accepted"
+            final_price = user_offer
+
+            # Store successful negotiation
+            negotiation, created = Negotiation.objects.get_or_create(user=user, product=product_obj)
+            negotiation.current_offer = user_offer
+            negotiation.final_price = user_offer
+            negotiation.is_successful = True
+            negotiation.save()
+
         elif user_offer >= product_obj.nprice * 0.8:
             counter_offer = round(product_obj.nprice * 0.9, 2)
             negotiation_result = "counter"
@@ -136,11 +164,11 @@ def negotiate(request, product_name):
 
     return render(request, "shop/negotiate.html", {
         "product": product_obj,
+        "final_price": final_price,
         "negotiation_result": negotiation_result,
         "counter_offer": counter_offer,
         'categories': categories
     })
-
 
 def blog(request):
     blog = articals.objects.all()
@@ -172,7 +200,8 @@ def search_view(request):
             return redirect('home')
     else:
         return redirect('home')
-    
+
+
 def logout(request):
     return redirect('home')
 
@@ -218,17 +247,24 @@ def add_to_cart(request):
     else:
         return JsonResponse({'status': 'invalid access'}, status=403)
 
+def checkout(request):
+    return render(request,"shop/checkout.html")
+
 def cart_page(request):
     fav_count = 0
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
-    if request.user.is_authenticated:
         categories = category.objects.filter(status=0)
         Cart = cart.objects.filter(User=request.user)
+
+        # Update cart items with negotiated price (if available)
+        for item in Cart:
+            negotiation = Negotiation.objects.filter(user=request.user, product=item.product, is_successful=True).first()
+            item.negotiated_price = negotiation.current_offer if negotiation else item.product.nprice
+
         return render(request, 'shop/cart.html', {'cart': Cart, 'categories': categories, 'fav_count': fav_count})
     else:
         return redirect('login')
-    
 
 def remove_cart(request, cid):
     cartitems = cart.objects.get(id=cid)
@@ -282,8 +318,12 @@ def fav_view_page(request):
         return render(request, 'shop/fav.html', {'fav': Fav,'categories': categories, 'fav_count': fav_count})
     else:
         return redirect('login')
-    
+ 
+   
 def remove_fav(request, cid):
     favitems = fav.objects.get(id=cid)
     favitems.delete()
-    return redirect('home')
+    return redirect('favviewpage')
+
+
+

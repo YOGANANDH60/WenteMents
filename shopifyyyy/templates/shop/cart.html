@@ -12,7 +12,7 @@
 <div class="container pt-3">
   <div class="row">
     <div class="col-12 text-center mb-3">
-      <a href="#" class="btn btn-primary btn-lg w-100">Checkout</a>
+      <a href="{% url "check" %}" class="btn btn-primary btn-lg w-100">Checkout</a>
     </div>
   </div>
 
@@ -36,9 +36,14 @@
                  style="max-width: 80px; height: auto;" />
           </td>
           <td>
-            <p class="mb-1"><strong>{{items.product.pname}}</strong></p>
-            <p class="text-muted">₹ {{items.product.nprice | floatformat:2}}</p>
-          </td>
+            <p class="mb-1"><strong>{{ items.product.pname }}</strong></p>
+            <p class="text-muted">
+                ₹ {{ items.negotiated_price | floatformat:2 }}
+                {% if items.negotiated_price < items.product.nprice %}
+                    <span class="text-success">(Negotiated Price)</span>
+                {% endif %}
+            </p>
+          </td>        
           <td>{{items.product_quantity}}</td>
           <td class="amt">₹ {{items.product_total_price | floatformat:2}}</td>
           <td>
