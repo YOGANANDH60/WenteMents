@@ -33,7 +33,7 @@
     />
     <!-- internal css -->
     <link rel="stylesheet" href="{% static 'css/index.css' %}" />
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   </head>
   <body>
@@ -80,6 +80,12 @@
                   class="fa-solid fa-cart-shopping text-success"
                   style="font-size: 25px"
                 ></i>
+                {% if cart_count and cart_count > 0 %}
+                <span class="badge bg-danger position-relative   translate-middle"
+                      style="font-size: 12px; padding: 4px 7px; border-radius: 50%;">
+                    {{ cart_count }}
+                </span>
+                {% endif %}
               </a>
             </div>
             <!-- fav img -->
@@ -104,6 +110,24 @@
                 {% endif %}
               </a>
             </div>
+
+            <!-- chat img -->
+            <div class="">
+              <a
+                href="{% url 'chatbot_response' %}"
+                style="
+                  width: 20px;
+                  height: 20px;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  color: green;
+                "
+              >
+                <i class="fa-solid fa-headset" style="font-size: 25px"></i>
+              </a>
+            </div>
+           
           </div>
           <!-- burger taggler -->
           <div role="button" class="d-inline-block d-lg-none list-inline-item">
@@ -163,8 +187,8 @@
                   <a href="{% url "about" %}" class="nav-link">About</a>
                 </li>
                 {% if request.user.is_authenticated %}
-                  <li class="nav-item">
-                    <a href="#" class="nav-link">{{request.user}}</a>
+                  <li class="nav-item ">
+                    <a href="#" class="nav-link text-danger fw-bold">{{request.user}}</a>
                   </li>
                   <li class="nav-item">
                     <a href="{% url 'account_logout' %}" class="nav-link">logout</a>

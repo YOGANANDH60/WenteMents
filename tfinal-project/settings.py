@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'chatbot'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -105,7 +106,7 @@ ROOT_URLCONF = 'tfinal-project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -185,7 +186,7 @@ STATICFILES_DIRS=[
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 JAZZMIN_SETTINGS={
-    'site_header':"WenteMents ",
+    'site_header':"WenteMents",
     'site_brand':"your perfect fits",
     'site_logo':"images/logoadmin.png",
     'copyright':"yoganandh",

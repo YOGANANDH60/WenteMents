@@ -18,20 +18,17 @@ def home(request):
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
 
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = cart.objects.filter(User=request.user).count()
 
     return render(request, "shop/index.html", {
         'products': products, 
         'categories': categories, 
         'fav_count': fav_count, 
+        'cart_count': cart_count
 
     })
-
-
-
-
-def some_view(request):
-    fav_count = fav.objects.filter(user=request.user).count()  
-    return render(request, 'home.html', {'fav_count': fav_count})
 
 def login_page(request):
     categories = category.objects.filter(status=0)
@@ -74,17 +71,23 @@ def categories(request):
     fav_count = 0
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
-    return render(request, "shop/category.html", {'categories': categories , 'fav_count': fav_count})     
+        
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = cart.objects.filter(User=request.user).count()
+    return render(request, "shop/category.html", {'categories': categories , 'fav_count': fav_count, 'cart_count': cart_count})     
 
 def productdetails(request,name):
     categories = category.objects.filter(status=0)
     fav_count = 0
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
-
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = cart.objects.filter(User=request.user).count()
     if(category.objects.filter(name=name,status=0)):
          productdetails = product.objects.filter(category__name=name) 
-         return render(request, "shop/productdetails.html", {'productdetails': productdetails,'categories': categories, 'fav_count': fav_count})
+         return render(request, "shop/productdetails.html", {'productdetails': productdetails,'categories': categories, 'fav_count': fav_count, 'cart_count': cart_count})
     else:
         messages.warning(request,"no such category found")
         return redirect('category')  
@@ -96,6 +99,10 @@ def single_productdetails(request, cname, spname):
 
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
+
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = cart.objects.filter(User=request.user).count()
 
     # Check if category exists
     if category.objects.filter(name=cname, status=0).exists():
@@ -113,6 +120,7 @@ def single_productdetails(request, cname, spname):
             'sideimg': sideimg,
             'categories': categories,
             'fav_count': fav_count,
+            'cart_count': cart_count,
             'final_price': final_price if final_price else products.nprice,  # Pass negotiated price if available
         }
         return render(request, 'shop/single_productdetails.html', context)
@@ -176,7 +184,10 @@ def blog(request):
     fav_count = 0
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
-    return render(request, "shop/blog.html", {'blog': blog,'categories': categories, 'fav_count': fav_count})
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = cart.objects.filter(User=request.user).count()
+    return render(request, "shop/blog.html", {'blog': blog,'categories': categories, 'fav_count': fav_count, 'cart_count': cart_count})
 
 
 def about(request):
@@ -184,7 +195,10 @@ def about(request):
     fav_count = 0
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
-    return render(request, "shop/about.html",{'categories': categories, 'fav_count': fav_count})
+    cart_count = 0
+    if request.user.is_authenticated:
+        cart_count = cart.objects.filter(User=request.user).count()
+    return render(request, "shop/about.html",{'categories': categories, 'fav_count': fav_count, 'cart_count': cart_count})
 
 
 def search_view(request):
@@ -252,17 +266,20 @@ def checkout(request):
 
 def cart_page(request):
     fav_count = 0
+    cart_count = 0
+       
     if request.user.is_authenticated:
         fav_count = fav.objects.filter(User=request.user).count()
         categories = category.objects.filter(status=0)
         Cart = cart.objects.filter(User=request.user)
+        cart_count = cart.objects.filter(User=request.user).count()
 
         # Update cart items with negotiated price (if available)
         for item in Cart:
             negotiation = Negotiation.objects.filter(user=request.user, product=item.product, is_successful=True).first()
             item.negotiated_price = negotiation.current_offer if negotiation else item.product.nprice
 
-        return render(request, 'shop/cart.html', {'cart': Cart, 'categories': categories, 'fav_count': fav_count})
+        return render(request, 'shop/cart.html', {'cart': Cart, 'categories': categories, 'fav_count': fav_count, 'cart_count': cart_count})
     else:
         return redirect('login')
 
@@ -310,12 +327,14 @@ def fav_page(request):
 
 def fav_view_page(request):
     fav_count = 0
-    if request.user.is_authenticated:
-        fav_count = fav.objects.filter(User=request.user).count()
+    cart_count = 0
+    
     if request.user.is_authenticated:
         categories = category.objects.filter(status=0)
         Fav = fav.objects.filter(User=request.user)
-        return render(request, 'shop/fav.html', {'fav': Fav,'categories': categories, 'fav_count': fav_count})
+        cart_count = cart.objects.filter(User=request.user).count()
+        fav_count = fav.objects.filter(User=request.user).count()
+        return render(request, 'shop/fav.html', {'fav': Fav,'categories': categories, 'fav_count': fav_count, 'cart_count': cart_count})
     else:
         return redirect('login')
  

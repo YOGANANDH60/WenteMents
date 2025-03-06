@@ -1,0 +1,108 @@
+{% extends "shop/main.html" %} {% block content %} {% load static %}
+<head>
+  <style>
+    .chat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 50px;
+      margin-bottom: 100px;
+    }
+    .head {
+      font-weight: bold;
+      font-size: large;
+      margin-bottom: 10px;
+      width: 30%;
+    }
+    #chatbox {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: center;
+      width: 50%;
+    }
+    #chat-form {
+      width: 50%;
+    }
+    #userInput {
+      border: 3px solid green;
+    }
+  </style>
+</head>
+<div class="chat">
+  <h2 class="head btn btn-primary py-2 px-5">Chatbot</h2>
+
+  <video  height="280" autoplay muted loop>
+    <source src="{% static 'images/f5b949e992a6620ed7530ad535697e0d.mp4' %}" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+  
+  <div id="chatbox">
+    <p><strong>Bot:</strong> Hi! Ask me something.</p>
+  </div>
+
+  <form id="chat-form" class="form-inline mt-4">
+    {% csrf_token %}
+    <!-- Django injects CSRF token here -->
+    <input
+      type="text"
+      class="form-control w-50 w-ld-30"
+      id="userInput"
+      placeholder="Type a message..."
+    />
+    <button type="button" class="btn btn-warning mt-2" onclick="sendMessage()">
+      Send
+    </button>
+  </form>
+</div>
+{% endblock %} {% block scripts %}
+
+<script>
+  function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie) {
+      const cookies = document.cookie.split("; ");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].split("=");
+        if (cookie[0] === "csrftoken") {
+          cookieValue = decodeURIComponent(cookie[1]);
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function sendMessage() {
+    var userMessage = $("#userInput").val();
+    if (!userMessage.trim()) return;
+
+    $("#chatbox").append("<p><strong>You:</strong> " + userMessage + "</p>");
+
+    $.ajax({
+      type: "POST",
+      url: "/chatbot/chat/", // ✅ Ensure this matches your Django URL
+      data: {
+        message: userMessage,
+        csrfmiddlewaretoken: getCSRFToken(), // ✅ Send CSRF token
+      },
+      success: function (response) {
+        $("#chatbox").append(
+          "<p><strong>Bot:</strong> " + response.response + "</p>"
+        );
+      },
+      error: function () {
+        $("#chatbox").append(
+          "<p><strong>Bot:</strong> Error sending message.</p>"
+        );
+      },
+    });
+
+    $("#userInput").val("");
+  }
+</script>
+
+{% endblock scripts %}
