@@ -59,7 +59,7 @@
         <p>Username: {{ user.username }}</p>
         <a href="{% url 'account_logout' %}">Logout</a>   
         {% else %}
-          <a href="{% provider_login_url 'google' %}?next=/">Login with Google</a>
+          <a href="{% provider_login_url 'google' %}?next=/" ><img src="{% static "images/google.png" %}" height="50px" width="80px" alt="">Login with Google</a>
         {% endif %}
       </div>
     </div>
