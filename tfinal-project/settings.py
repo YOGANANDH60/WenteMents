@@ -180,7 +180,7 @@ STATICFILES_DIRS=[
     BASE_DIR/'static'
 ]
 
-import os
+
 
 
 
@@ -192,7 +192,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 JAZZMIN_SETTINGS={
     'site_header':"WenteMents",
     'site_brand':"your perfect fits",
-    'site_logo':"images/logoadmin.png",
+    'site_logo':"images/WM.jpg",
     'copyright':"yoganandh",
     }
 

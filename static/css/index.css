@@ -1,6 +1,12 @@
+
 body {
   margin: 0px;
   padding: 0px;
+  background-image: url('images/logo.jpg'); /* Path to your watermark image */
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain; /* Adjust as needed */
+  opacity: 0.5; /* Set transparency */
 }
 
 .burger {
