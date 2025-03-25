@@ -42,11 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'shopifyyyy',
+    'chatbot',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'chatbot'
+    
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -195,3 +196,5 @@ JAZZMIN_SETTINGS={
     'copyright':"yoganandh",
     }
 
+# settings.py
+# settings.py
