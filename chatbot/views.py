@@ -34,7 +34,7 @@ def chatbot_response(request):
             "how are you": "I'm just a bot, but I'm doing great! How about you?",
             "what is your name": "I'm wentment's chatbot!",
             "bye": "Goodbye! Have a great day!",
-            "who you are": "I'm wentment's chatbot! How can I help you?",
+            "who are you": "I'm wentment's chatbot! How can I help you?",
             "category": "We have a <li>outfit</li><li>Accessories</li><li>Sports</li><li>Games</li><li>Electronics</li> of categories. What are you looking for?",
         }
 
